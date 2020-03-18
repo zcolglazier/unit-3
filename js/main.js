@@ -44,7 +44,7 @@ var container = d3.select("body")
 
       //scales - to calculate the linear scale for x and y, the min and max of my data set, and the color ramp
       var x = d3.scaleLinear()
-          .range([90, 810])
+          .range([90, 750])
           .domain([0, 3]);
 
       var minPop = d3.min(dataArray, function(d){
@@ -73,7 +73,41 @@ var container = d3.select("body")
           .attr("x", 450)
           .attr("y", 30)
           .text("City Populations");
-          
+
+      var labels = container.selectAll(".labels")
+          .data(dataArray)
+          .enter()
+          .append("text")
+          .attr("class", "labels")
+          .attr("text-anchor", "left")
+          .attr("y", function(d){
+                     //vertical position centered on each circle
+              return y(d.population);
+          });
+
+      var nameLine = labels.append("tspan")
+          .attr("class", "nameLine")
+          .attr("x", function(d,i){
+                     //horizontal position to the right of each circle
+              return x(i) + Math.sqrt(d.population * 0.01 / Math.PI) + 5;
+            })
+          .text(function(d){
+              return d.city;
+          });
+
+      var format = d3.format(",");
+             //second line of label
+      var popLine = labels.append("tspan")
+          .attr("class", "popLine")
+          .attr("x", function(d,i){
+                     //horizontal position to the right of each circle
+              return x(i) + Math.sqrt(d.population * 0.01 / Math.PI) + 5;
+          })
+          .attr("dy", "15")
+          .text(function(d){
+              return "Pop. " + format(d.population);
+          });
+
       var color = d3.scaleLinear()
           .range([
               "#D3BDFE",
