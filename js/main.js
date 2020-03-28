@@ -1,16 +1,40 @@
 //Coded by Zoey Colglazier, March 2020
 
 function setMap(){
-    //use Promise.all to parallelize asynchronous data loading
-    var promises = [d3.csv("data/data_cleaned.csv"),
-                    d3.json("data/WI_county.json"),
-                   ];
+
+    //map frame dimensions
+    var width = 960,
+        height = 460;
+
+    var map = d3.select("body")
+        .append("svg")
+        .attr("class", "map")
+        .attr("width", width)
+        .attr("height", height);
+
+    var projection = d3.geoAlbers()
+        .center([-12.73, 40.87])
+        .rotate([79.18, -3.64, 0])
+        .parallels([26.09, 47.14])
+        .scale(2295.96)
+        .translate([width / 2, height / 2]);
+
+    var path = d3.geoPath()
+        .projection(projection);
+
+    var promises = [];
+    promises.push(d3.csv("data/data_cleaned.csv"));
+    promises.push(d3.json("data/WI_county.json"));
     Promise.all(promises).then(callback);
 
     function callback(data){
-	      csvData = data[0];
-	      counties = data[1];
+        csvData = data[0];
+        counties = data[1];
         var wicounties = topojson.feature(counties, counties.objects.WI_county);
+        var wis = map.append("path")
+            .datum(wicounties)
+            .attr("class", "counties")
+            .attr("d", path);
         console.log(csvData);
         console.log(counties);
     };
