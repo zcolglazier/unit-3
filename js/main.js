@@ -31,12 +31,12 @@ function setMap(){
         csvData = data[0];
         counties = data[1];
         var wicounties = topojson.feature(counties, counties.objects.WI_county);
-        // var wis = map.append("path")
-        //     .datum(wicounties)
-        //     .attr("class", "counties")
-        //     .attr("d", path);
+        var wis = map.append("path")
+            .datum(wicounties)
+            .attr("class", "counties")
+            .attr("d", path);
         var regions = map.selectAll(".regions")
-            .data(wicounties)
+            .data(csvData)
             .enter()
             .append("path")
             .attr("class", function(d){
