@@ -24,13 +24,14 @@ function setMap(){
 
     var promises = [];
     promises.push(d3.csv("data/data_cleaned.csv"));
-    promises.push(d3.json("data/WI_county.json"));
+    promises.push(d3.json("data/WI_withall.json"));
     Promise.all(promises).then(callback);
 
     function callback(data){
         csvData = data[0];
         counties = data[1];
-        var wicounties = topojson.feature(counties, counties.objects.WI_county).features;
+        console.log(counties)
+        var wicounties = topojson.feature(counties, counties.objects.WI_withall).features;
         //console.log(wicounties)
         var wis = map.append("path")
             .datum(wicounties)
@@ -41,7 +42,7 @@ function setMap(){
             .enter()
             .append("path")
             .attr("class", function(d){
-              return "regions " + d.name;
+              return "regions " + d.COUNTY_NAM;
               })
             .attr("d", path);
         console.log(csvData)
