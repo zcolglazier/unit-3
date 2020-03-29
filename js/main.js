@@ -3,8 +3,8 @@
 function setMap(){
 
     //map frame dimensions
-    var width = 960,
-        height = 460;
+    var width = 1000,
+        height = 500;
 
     var map = d3.select("body")
         .append("svg")
@@ -30,7 +30,8 @@ function setMap(){
     function callback(data){
         csvData = data[0];
         counties = data[1];
-        var wicounties = topojson.feature(counties, counties.objects.WI_county);
+        var wicounties = topojson.feature(counties, counties.objects.WI_county).features;
+        //console.log(wicounties)
         var wis = map.append("path")
             .datum(wicounties)
             .attr("class", "counties")
@@ -40,11 +41,12 @@ function setMap(){
             .enter()
             .append("path")
             .attr("class", function(d){
-              return "regions " + d.properties.adm1_code;
+              return "regions " + d.name;
               })
             .attr("d", path);
-        console.log(csvData);
-        console.log(counties);
+        console.log(csvData)
+        //console.log(regions)
+        //console.log(counties);
     };
 };
 
