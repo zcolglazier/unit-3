@@ -38,7 +38,7 @@ function setMap(){
             .attr("class", "counties")
             .attr("d", path);
         var regions = map.selectAll(".regions")
-            .data(csvData)
+            .data(wicounties)
             .enter()
             .append("path")
             .attr("class", function(d){
