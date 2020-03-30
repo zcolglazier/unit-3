@@ -13,10 +13,10 @@ function setMap(){
         .attr("height", height);
 
     var projection = d3.geoAlbers()
-        .center([-12.73, 40.87])
-        .rotate([79.18, -3.64, 0])
+        .center([0, 40.87])
+        .rotate([79.18, 0, 0])
         .parallels([26.09, 47.14])
-        .scale(2295.96)
+        .scale(100)
         .translate([width / 2, height / 2]);
 
     var path = d3.geoPath()
@@ -32,7 +32,8 @@ function setMap(){
         counties = data[1];
         //console.log(counties)
         var wicounties = topojson.feature(counties, counties.objects.WI_withall).features;
-        //console.log(wicounties)
+        console.log(wicounties)
+        console.log("here")
         // var wis = map.append("path")
         //     .data(wicounties)
         //     .enter()
@@ -46,12 +47,12 @@ function setMap(){
             .enter()
             .append("path")
             .attr("class", function(d){
-              return "counties " + d.COUNTY_NAM;
+              return "counties " + d.properties.COUNTY_NAM;
               })
             .attr("d", path);
         //console.log(csvData)
         //console.log(regions)
-        //console.log(counties);
+        console.log(county);
     };
 };
 
