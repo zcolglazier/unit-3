@@ -30,10 +30,18 @@ function setMap(){
     function callback(data){
         csvData = data[0];
         counties = data[1];
-        console.log(counties)
+        //console.log(counties)
         var wicounties = topojson.feature(counties, counties.objects.WI_withall).features;
         //console.log(wicounties)
-        var wis = map.append("path")
+        // var wis = map.append("path")
+        //     .data(wicounties)
+        //     .enter()
+        //     .append("path")
+        //     .attr("class", function(d){
+        //       return "counties " + d.COUNTY_NAM;
+        //       })
+        //     .attr("d", path);
+        var county = map.selectAll(".counties")
             .data(wicounties)
             .enter()
             .append("path")
@@ -41,14 +49,6 @@ function setMap(){
               return "counties " + d.COUNTY_NAM;
               })
             .attr("d", path);
-        // var regions = map.selectAll(".regions")
-        //     .data(wicounties)
-        //     .enter()
-        //     .append("path")
-        //     .attr("class", function(d){
-        //       return "regions " + d.COUNTY_NAM;
-        //       })
-        //     .attr("d", path);
         //console.log(csvData)
         //console.log(regions)
         //console.log(counties);
