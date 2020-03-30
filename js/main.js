@@ -13,10 +13,10 @@ function setMap(){
         .attr("height", height);
 
     var projection = d3.geoAlbers()
-        .center([0, 40.87])
-        .rotate([79.18, 0, 0])
-        .parallels([26.09, 47.14])
-        .scale(1500)
+        .center([-2, 41])
+        .rotate([89, -4, 0])
+        .parallels([25, 46.00])
+        .scale(5000)
         .translate([width / 2, height / 2]);
 
     var path = d3.geoPath()
