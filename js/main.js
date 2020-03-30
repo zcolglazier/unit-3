@@ -34,18 +34,22 @@ function setMap(){
         var wicounties = topojson.feature(counties, counties.objects.WI_withall).features;
         //console.log(wicounties)
         var wis = map.append("path")
-            .datum(wicounties)
-            .attr("class", "counties")
-            .attr("d", path);
-        var regions = map.selectAll(".regions")
             .data(wicounties)
             .enter()
             .append("path")
             .attr("class", function(d){
-              return "regions " + d.COUNTY_NAM;
+              return "counties " + d.COUNTY_NAM;
               })
             .attr("d", path);
-        console.log(csvData)
+        // var regions = map.selectAll(".regions")
+        //     .data(wicounties)
+        //     .enter()
+        //     .append("path")
+        //     .attr("class", function(d){
+        //       return "regions " + d.COUNTY_NAM;
+        //       })
+        //     .attr("d", path);
+        //console.log(csvData)
         //console.log(regions)
         //console.log(counties);
     };
