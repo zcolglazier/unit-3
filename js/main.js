@@ -34,14 +34,6 @@ function setMap(){
         var wicounties = topojson.feature(counties, counties.objects.WI_correct).features;
         console.log(wicounties)
         console.log("here")
-        // var wis = map.append("path")
-        //     .data(wicounties)
-        //     .enter()
-        //     .append("path")
-        //     .attr("class", function(d){
-        //       return "counties " + d.COUNTY_NAM;
-        //       })
-        //     .attr("d", path);
         var county = map.selectAll(".counties")
             .data(wicounties)
             .enter()
@@ -54,6 +46,16 @@ function setMap(){
         //console.log(regions)
         console.log(county);
     };
+
+    var graticule = d3.geoGraticule()
+        .step([5, 5]);
+
+    var gratLines = map.selectAll(".gratLines")
+        .data(graticule.lines())
+        .enter()
+        .append("path")
+        .attr("class", "gratLines")
+        .attr("d", path);
 };
 
 setMap()
