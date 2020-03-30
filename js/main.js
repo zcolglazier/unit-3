@@ -16,7 +16,7 @@ function setMap(){
         .center([0, 40.87])
         .rotate([79.18, 0, 0])
         .parallels([26.09, 47.14])
-        .scale(100)
+        .scale(1500)
         .translate([width / 2, height / 2]);
 
     var path = d3.geoPath()
@@ -24,14 +24,14 @@ function setMap(){
 
     var promises = [];
     promises.push(d3.csv("data/data_cleaned.csv"));
-    promises.push(d3.json("data/WI_withall.json"));
+    promises.push(d3.json("data/WI_correct.json"));
     Promise.all(promises).then(callback);
 
     function callback(data){
         csvData = data[0];
         counties = data[1];
         //console.log(counties)
-        var wicounties = topojson.feature(counties, counties.objects.WI_withall).features;
+        var wicounties = topojson.feature(counties, counties.objects.WI_correct).features;
         console.log(wicounties)
         console.log("here")
         // var wis = map.append("path")
