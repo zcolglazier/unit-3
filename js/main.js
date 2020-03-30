@@ -50,6 +50,11 @@ function setMap(){
     var graticule = d3.geoGraticule()
         .step([5, 5]);
 
+    var gratBackground = map.append("path")
+        .datum(graticule.outline())
+        .attr("class", "gratBackground")
+        .attr("d", path)
+
     var gratLines = map.selectAll(".gratLines")
         .data(graticule.lines())
         .enter()
