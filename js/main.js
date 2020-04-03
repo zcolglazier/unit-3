@@ -30,10 +30,11 @@ function setMap(){
     function callback(data){
         csvData = data[0];
         counties = data[1];
-        //console.log(counties)
+
+        setGraticule(map,path);
+
         var wicounties = topojson.feature(counties, counties.objects.WI_correct).features;
-        console.log(wicounties)
-        console.log("here")
+
         var county = map.selectAll(".counties")
             .data(wicounties)
             .enter()
@@ -42,25 +43,30 @@ function setMap(){
               return "counties " + d.properties.COUNTY_NAM;
               })
             .attr("d", path);
-        //console.log(csvData)
-        //console.log(regions)
-        console.log(county);
+
+        //setEnumUnits(counties, map, path);
     };
 
-    var graticule = d3.geoGraticule()
-        .step([5, 5]);
+    function setGraticule(map, path){
+        var graticule = d3.geoGraticule()
+          .step([5, 5])
 
-    var gratBackground = map.append("path")
-        .datum(graticule.outline())
-        .attr("class", "gratBackground")
-        .attr("d", path)
+        var gratBackground = map.append("path")
+          .datum(graticule.outline())
+          .attr("class", "gratBackground")
+          .attr("d", path)
 
-    var gratLines = map.selectAll(".gratLines")
-        .data(graticule.lines())
-        .enter()
-        .append("path")
-        .attr("class", "gratLines")
-        .attr("d", path);
+        var gratLines = map.selectAll(".gratLines")
+          .data(graticule.lines())
+          .enter()
+          .append("path")
+          .attr("class", "gratLines")
+          .attr("d", path);
+      };
+
+      // function setEnumUnits(counties, map, path){
+      //
+      // }
 };
 
 setMap()
