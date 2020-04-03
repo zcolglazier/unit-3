@@ -1,8 +1,11 @@
-//Coded by Zoey Colglazier, March 2020
+//Coded by Zoey Colglazier, April 2020
+(function(){
+  var attrArray =["Total Population in Poverty", "Total - Male", "Total - Female", "Total - Under 18 years", "Total - 18-64 years", "Total - 65 years and over"];
+  var expressed = attrArray[0];
+
+  window.onload = setMap();
 
 function setMap(){
-
-    //map frame dimensions
     var width = 1000,
         height = 500;
 
@@ -30,21 +33,10 @@ function setMap(){
     function callback(data){
         csvData = data[0];
         counties = data[1];
-
-        setGraticule(map,path);
-
         var wicounties = topojson.feature(counties, counties.objects.WI_correct).features;
-
-        var county = map.selectAll(".counties")
-            .data(wicounties)
-            .enter()
-            .append("path")
-            .attr("class", function(d){
-              return "counties " + d.properties.COUNTY_NAM;
-              })
-            .attr("d", path);
-
-        //setEnumUnits(counties, map, path);
+        console.log(wicounties)
+        setGraticule(map,path);
+        setEnumUnits(wicounties, map, path);
     };
 
     function setGraticule(map, path){
@@ -64,9 +56,17 @@ function setMap(){
           .attr("d", path);
       };
 
-      // function setEnumUnits(counties, map, path){
-      //
-      // }
+      function setEnumUnits(wicounties, map, path){
+        var county = map.selectAll(".counties")
+            .data(wicounties)
+            .enter()
+            .append("path")
+            .attr("class", function(d){
+              return "counties " + d.properties.COUNTY_NAM;
+              })
+            .attr("d", path);
+      };
 };
 
-setMap()
+})();
+//setMap()
