@@ -56,12 +56,13 @@ function setMap(){
         };
         var clusters = ss.ckmeans(domainArray, 5);
         domainArray = clusters.map(function(d){
-        return d3.min(d);
+          return d3.min(d);
         });
         domainArray.shift();
         colorScale.domain(domainArray);
         return colorScale;
     };
+
     function setGraticule(map, path){
         var graticule = d3.geoGraticule()
           .step([5, 5])
