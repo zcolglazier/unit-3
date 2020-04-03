@@ -34,11 +34,34 @@ function setMap(){
         csvData = data[0];
         counties = data[1];
         var wicounties = topojson.feature(counties, counties.objects.WI_correct).features;
-        console.log(wicounties)
+        var colorScale = setColorScale(csvData);
+        //console.log(wicounties)
         setGraticule(map,path);
-        setEnumUnits(wicounties, map, path);
+        setEnumUnits(wicounties, map, path, colorScale);
     };
-
+    function setColorScale(data){
+        var colorClasses = [
+          "#D4B9DA",
+          "#C994C7",
+          "#DF65B0",
+          "#DD1C77",
+          "#980043"
+        ];
+        var colorScale = d3.scaleThreshold()
+          .range(colorClasses);
+        var domainArray = [];
+        for (var i=0; i<data.length; i++){
+          var val = parseFloat(data[i][expressed]);
+          domainArray.push(val);
+        };
+        var clusters = ss.ckmeans(domainArray, 5);
+        domainArray = clusters.map(function(d){
+        return d3.min(d);
+        });
+        domainArray.shift();
+        colorScale.domain(domainArray);
+        return colorScale;
+    };
     function setGraticule(map, path){
         var graticule = d3.geoGraticule()
           .step([5, 5])
