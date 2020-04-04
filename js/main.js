@@ -114,10 +114,14 @@ function setMap(){
         var yScale = d3.scaleLinear()
             .range([0, chartHeight])
             .domain([0, 105]);
+
         var bars = chart.selectAll(".bars")
             .data(csvData)
             .enter()
             .append("rect")
+            .sort(function(a, b){
+                return a[expressed]-b[expressed]
+            })
             .attr("class", function(d){
                 return "bars" + d.COUNTY_NAM;
             })
@@ -134,6 +138,34 @@ function setMap(){
             .style("fill", function(d){
                 return colorScale(d[expressed]);
             });
+
+        var numbers = chart.selectAll(".numbers")
+            .data(csvData)
+            .enter()
+            .append("text")
+            .sort(function(a, b){
+                return a[expressed]-b[expressed]
+            })
+            .attr("class", function(d){
+                return "numbers " + d.COUNTY_NAM;
+            })
+            .attr("text-anchor", "middle")
+            .attr("x", function(d, i){
+                var fraction = chartWidth / csvData.length;
+                return i * fraction + (fraction - 1) / 2;
+            })
+            .attr("y", function(d){
+                return chartHeight - yScale(parseFloat(d[expressed])) + 15;
+            })
+            .text(function(d){
+                return d[expressed];
+            });
+
+        var chartTitle = chart.append("text")
+            .attr("x", 20)
+            .attr("y", 40)
+            .attr("class", "chartTitle")
+            .text(attrArray[0] + " in each county");
       };
 };
 
