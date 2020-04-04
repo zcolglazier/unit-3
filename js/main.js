@@ -105,11 +105,35 @@ function setMap(){
         var chartWidth = window.innerWidth*0.425,
             chartHeight = 460;
 
-        var char = d3.select("body")
+        var chart = d3.select("body")
             .append("svg")
             .attr("width", chartWidth)
             .attr("height", chartHeight)
             .attr("class", "chart");
+
+        var yScale = d3.scaleLinear()
+            .range([0, chartHeight])
+            .domain([0, 105]);
+        var bars = chart.selectAll(".bars")
+            .data(csvData)
+            .enter()
+            .append("rect")
+            .attr("class", function(d){
+                return "bars" + d.COUNTY_NAM;
+            })
+            .attr("width", chartWidth / csvData.length - 1)
+            .attr("x", function(d, i){
+                return i*(chartWidth/csvData.length);
+            })
+            .attr("height", function(d){
+                return yScale(parseFloat(d[expressed]));
+            })
+            .attr("y", function(d){
+                return chartHeight - yScale(parseFloat(d[expressed]));
+            })
+            .style("fill", function(d){
+                return colorScale(d[expressed]);
+            });
       };
 };
 
