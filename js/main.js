@@ -2,7 +2,7 @@
 (function(){
   var attrArray =["Total Population in Poverty", "Total - Male", "Total - Female", "Total - Under 18 years", "Total - 18-64 years", "Total - 65 years and over"];
   var expressed = attrArray[0];
-
+  console.log(expressed)
   window.onload = setMap();
 
 function setMap(){
@@ -40,12 +40,13 @@ function setMap(){
         setEnumUnits(wicounties, map, path, colorScale);
     };
     function setColorScale(data){
+        console.log("reached color scale")
         var colorClasses = [
-          "#D4B9DA",
-          "#C994C7",
-          "#DF65B0",
-          "#DD1C77",
-          "#980043"
+          "#ffffcc",
+          "#a1dab4",
+          "#41b6c4",
+          "#2c7fb8",
+          "#253494"
         ];
         var colorScale = d3.scaleThreshold()
           .range(colorClasses);
@@ -80,7 +81,8 @@ function setMap(){
           .attr("d", path);
       };
 
-      function setEnumUnits(wicounties, map, path){
+      function setEnumUnits(wicounties, map, path, colorScale){
+        console.log("coloring")
         var county = map.selectAll(".counties")
             .data(wicounties)
             .enter()
@@ -88,7 +90,15 @@ function setMap(){
             .attr("class", function(d){
               return "counties " + d.properties.COUNTY_NAM;
               })
-            .attr("d", path);
+            .attr("d", path)
+            .style("fill", function(d){
+              var value = d.properties[expressed];
+              if(value) {
+                return colorScale(d.properties[expressed]);
+              } else{
+                return "#ccc";
+              }
+            });
       };
 };
 
