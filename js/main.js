@@ -6,8 +6,8 @@
   window.onload = setMap();
 
 function setMap(){
-    var width = 1000,
-        height = 500;
+    var width = window.innerWidth*0.5,
+        height = 460;
 
     var map = d3.select("body")
         .append("svg")
@@ -35,9 +35,9 @@ function setMap(){
         counties = data[1];
         var wicounties = topojson.feature(counties, counties.objects.WI_correct).features;
         var colorScale = setColorScale(csvData);
-        //console.log(wicounties)
         setGraticule(map,path);
         setEnumUnits(wicounties, map, path, colorScale);
+        setChart(csvData, colorScale);
     };
     function setColorScale(data){
         console.log("reached color scale")
@@ -92,13 +92,24 @@ function setMap(){
               })
             .attr("d", path)
             .style("fill", function(d){
-              var value = d.properties[expressed];
-              if(value) {
-                return colorScale(d.properties[expressed]);
-              } else{
-                return "#ccc";
+                var value = d.properties[expressed];
+                if(value) {
+                  return colorScale(d.properties[expressed]);
+                } else{
+                  return "#ccc";
               }
             });
+      };
+
+      function setChart(csvData, colorScale){
+        var chartWidth = window.innerWidth*0.425,
+            chartHeight = 460;
+
+        var char = d3.select("body")
+            .append("svg")
+            .attr("width", chartWidth)
+            .attr("height", chartHeight)
+            .attr("class", "chart");
       };
 };
 
