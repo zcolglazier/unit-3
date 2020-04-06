@@ -1,8 +1,8 @@
 //Coded by Zoey Colglazier, April 2020
 (function(){
-  var attrArray =["Total Population in Poverty", "Total - Male", "Total - Female", "Total - Under 18 years", "Total - 18-64 years", "Total - 65 years and over"];
+  var attrArray =["Total Popu", "Total - Male", "Total - Female", "Total - Under 18 years", "Total - 18-64 years", "Total - 65 years and over"];
   var expressed = attrArray[0];
-  console.log(expressed)
+  //console.log(expressed)
   window.onload = setMap();
 
 function setMap(){
@@ -34,10 +34,10 @@ function setMap(){
         csvData = data[0];
         counties = data[1];
         var wicounties = topojson.feature(counties, counties.objects.WI_correct).features;
-        var colorScale = setColorScale(csvData);
+        var colorScale = setColorScale(wicounties);
         setGraticule(map,path);
         setEnumUnits(wicounties, map, path, colorScale);
-        setChart(csvData, colorScale);
+        setChart(wicounties, colorScale);
     };
     function setColorScale(data){
         console.log("reached color scale")
@@ -52,7 +52,8 @@ function setMap(){
           .range(colorClasses);
         var domainArray = [];
         for (var i=0; i<data.length; i++){
-          var val = parseFloat(data[i][expressed]);
+          var val = parseFloat(data[i].properties[expressed]);
+          console.log(data[i].properties[expressed])
           domainArray.push(val);
         };
         var clusters = ss.ckmeans(domainArray, 5);
@@ -97,6 +98,7 @@ function setMap(){
               var value = d.properties[expressed];
               console.log(value)
               if(value) {
+                console.log(colorScale(d.properties[expressed]))
                 return colorScale(d.properties[expressed]);
               } else{
                 return "#ccc";
@@ -104,7 +106,7 @@ function setMap(){
             });
       };
 
-      function setChart(csvData, colorScale){
+      function setChart(wicounties, colorScale){
         var chartWidth = window.innerWidth*0.425,
             chartHeight = 460;
 
@@ -115,36 +117,44 @@ function setMap(){
             .attr("class", "chart");
 
         var yScale = d3.scaleLinear()
+            //console.log(chartHeight)
             .range([0, chartHeight])
-            .domain([0, 105]);
+            .domain([0, d3.max(wicounties, function (d){
+              return parseFloat(d.properties[expressed])*1.2
+            })]);
 
         var bars = chart.selectAll(".bars")
-            .data(csvData)
+            .data(wicounties)
             .enter()
             .append("rect")
             .sort(function(a, b){
                 return a[expressed]-b[expressed]
             })
             .attr("class", function(d){
-                return "bars" + d.COUNTY_NAM;
+                return "bars" + d.properties.COUNTY_NAM;
             })
-            .attr("width", chartWidth / csvData.length - 1)
+            .attr("width", chartWidth / wicounties.length - 1)
             .attr("x", function(d, i){
-                return i*(chartWidth/csvData.length);
+                return i*(chartWidth/wicounties.length);
             })
             .attr("height", function(d){
-                //console.log(yScale(parseFloat(d[expressed])))
-                return yScale(parseFloat(d[expressed]));
+                //console.log(expressed)
+                //console.log("look here")
+                //console.log(d.properties)
+                //console.log(expressed)
+                //console.log(d.properties["Total Popu"])
+                //console.log(yScale(parseFloat(d.properties[expressed])))
+                return yScale(parseFloat(d.properties[expressed]));
             })
             .attr("y", function(d){
-              return chartHeight - yScale(parseFloat(d[expressed]));
+              return chartHeight - yScale(parseFloat(d.properties[expressed]));
             })
             .style("fill", function(d){
-                return colorScale(d[expressed]);
+                return colorScale(d.properties[expressed]);
             });
 
         var numbers = chart.selectAll(".numbers")
-            .data(csvData)
+            .data(wicounties)
             .enter()
             .append("text")
             .sort(function(a, b){
@@ -156,14 +166,16 @@ function setMap(){
             })
             .attr("text-anchor", "middle")
             .attr("x", function(d, i){
-                var fraction = chartWidth / csvData.length;
+                var fraction = chartWidth / wicounties.length;
                 return i * fraction + (fraction - 1) / 2;
             })
             .attr("y", function(d){
-                return chartHeight - yScale(parseFloat(d[expressed])) + 15;
+                console.log(d.properties[expressed])
+                console.log(yScale(parseFloat(d.properties[expressed])))
+                return chartHeight - yScale(parseFloat(d.properties[expressed])) + 15;
             })
             .text(function(d){
-                return d[expressed];
+                return d.properties[expressed];
             });
 
         var chartTitle = chart.append("text")
