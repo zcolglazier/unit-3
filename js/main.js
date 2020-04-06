@@ -61,6 +61,7 @@ function setMap(){
         });
         domainArray.shift();
         colorScale.domain(domainArray);
+        //console.log(domainArray);
         return colorScale;
     };
 
@@ -92,12 +93,14 @@ function setMap(){
               })
             .attr("d", path)
             .style("fill", function(d){
-                var value = d.properties[expressed];
-                if(value) {
-                  return colorScale(d.properties[expressed]);
-                } else{
-                  return "#ccc";
-              }
+              console.log(d.properties)
+              var value = d.properties[expressed];
+              console.log(value)
+              if(value) {
+                return colorScale(d.properties[expressed]);
+              } else{
+                return "#ccc";
+            }
             });
       };
 
@@ -130,11 +133,11 @@ function setMap(){
                 return i*(chartWidth/csvData.length);
             })
             .attr("height", function(d){
-                console.log(yScale(parseFloat(d[expressed])))
+                //console.log(yScale(parseFloat(d[expressed])))
                 return yScale(parseFloat(d[expressed]));
             })
             .attr("y", function(d){
-                return chartHeight - yScale(parseFloat(d[expressed]));
+              return chartHeight - yScale(parseFloat(d[expressed]));
             })
             .style("fill", function(d){
                 return colorScale(d[expressed]);
@@ -145,6 +148,7 @@ function setMap(){
             .enter()
             .append("text")
             .sort(function(a, b){
+                //console.log(a[expressed]-b[expressed])
                 return a[expressed]-b[expressed]
             })
             .attr("class", function(d){
