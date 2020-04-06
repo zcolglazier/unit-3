@@ -130,6 +130,7 @@ function setMap(){
                 return i*(chartWidth/csvData.length);
             })
             .attr("height", function(d){
+                console.log(yScale(parseFloat(d[expressed])))
                 return yScale(parseFloat(d[expressed]));
             })
             .attr("y", function(d){
