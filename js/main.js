@@ -108,13 +108,25 @@ function setMap(){
 
       function setChart(wicounties, colorScale){
         var chartWidth = window.innerWidth*0.425,
-            chartHeight = 460;
+            chartHeight = 473,
+            leftPadding = 25,
+            rightPadding = 2,
+            topBottomPadding = 5,
+            chartInnerWidth = chartWidth - leftPadding - rightPadding,
+            chartInnerHeight = chartHeight - topBottomPadding * 2,
+            translate = "translate(" + leftPadding + "," + topBottomPadding + ")";
 
         var chart = d3.select("body")
             .append("svg")
             .attr("width", chartWidth)
             .attr("height", chartHeight)
             .attr("class", "chart");
+
+        var chartBackground = chart.append("rect")
+            .attr("class", "chartBackground")
+            .attr("width", chartInnerWidth)
+            .attr("height", chartInnerHeight)
+            .attr("transform", translate);
 
         var yScale = d3.scaleLinear()
             //console.log(chartHeight)
@@ -135,54 +147,62 @@ function setMap(){
             })
             .attr("width", chartWidth / wicounties.length - 1)
             .attr("x", function(d, i){
-                return i*(chartWidth/wicounties.length);
+                return i*(chartWidth/wicounties.length) + leftPadding;
             })
-            .attr("height", function(d){
-                //console.log(expressed)
-                //console.log("look here")
-                //console.log(d.properties)
-                //console.log(expressed)
-                //console.log(d.properties["Total Popu"])
-                //console.log(yScale(parseFloat(d.properties[expressed])))
-                return yScale(parseFloat(d.properties[expressed]));
+            .attr("height", function(d, i){
+                return 463 - yScale(parseFloat(d.properties[expressed]));
             })
-            .attr("y", function(d){
-              return chartHeight - yScale(parseFloat(d.properties[expressed]));
+            .attr("y", function(d, i){
+              return yScale(parseFloat(d.properties[expressed])) + topBottomPadding;
             })
             .style("fill", function(d){
                 return colorScale(d.properties[expressed]);
             });
 
-        var numbers = chart.selectAll(".numbers")
-            .data(wicounties)
-            .enter()
-            .append("text")
-            .sort(function(a, b){
-                //console.log(a[expressed]-b[expressed])
-                return a[expressed]-b[expressed]
-            })
-            .attr("class", function(d){
-                return "numbers " + d.COUNTY_NAM;
-            })
-            .attr("text-anchor", "middle")
-            .attr("x", function(d, i){
-                var fraction = chartWidth / wicounties.length;
-                return i * fraction + (fraction - 1) / 2;
-            })
-            .attr("y", function(d){
-                console.log(d.properties[expressed])
-                console.log(yScale(parseFloat(d.properties[expressed])))
-                return chartHeight - yScale(parseFloat(d.properties[expressed])) + 15;
-            })
-            .text(function(d){
-                return d.properties[expressed];
-            });
+        // var numbers = chart.selectAll(".numbers")
+        //     .data(wicounties)
+        //     .enter()
+        //     .append("text")
+        //     .sort(function(a, b){
+        //         //console.log(a[expressed]-b[expressed])
+        //         return a[expressed]-b[expressed]
+        //     })
+        //     .attr("class", function(d){
+        //         return "numbers " + d.COUNTY_NAM;
+        //     })
+        //     .attr("text-anchor", "middle")
+        //     .attr("x", function(d, i){
+        //         var fraction = chartWidth / wicounties.length;
+        //         return i * fraction + (fraction - 1) / 2;
+        //     })
+        //     .attr("y", function(d){
+        //         //console.log(d.properties[expressed])
+        //         //console.log(yScale(parseFloat(d.properties[expressed])))
+        //         return chartHeight - yScale(parseFloat(d.properties[expressed])) + 15;
+        //     })
+        //     .text(function(d){
+        //         return d.properties[expressed];
+        //     });
 
         var chartTitle = chart.append("text")
-            .attr("x", 20)
+            .attr("x", 40)
             .attr("y", 40)
             .attr("class", "chartTitle")
-            .text(attrArray[0] + " in each county");
+            .text(attrArray[0]+"lation in Poverty");
+
+        var yAxis = d3.axisLeft()
+            .scale(yScale);
+
+        var axis = chart.append("g")
+            .attr("class", "axis")
+            .attr("transform", translate)
+            .call(yAxis);
+
+        var chartFrame = chart.append("rect")
+            .attr("class", "chartFrame")
+            .attr("width", chartInnerWidth)
+            .attr("height", chartInnerHeight)
+            .attr("transform", translate);
       };
 };
 
