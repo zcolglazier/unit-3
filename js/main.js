@@ -41,6 +41,12 @@ function setMap(){
         // console.log(states)
         // console.log("topo")
         // console.log(allstates)
+        var background_states = map.append("path")
+            console.log('look here')
+            .data(allstates)
+            .enter()
+            .attr("class", "states")
+            .attr("d", path);
 
         var colorScale = setColorScale(wicounties);
         setGraticule(map,path);
@@ -92,12 +98,6 @@ function setMap(){
       };
 
       function setEnumUnits(wicounties, map, path, colorScale){
-        // var background_states = map.append("path")
-        //     console.log('look here')
-        //     .datum(allstates)
-        //     .attr("class", "states")
-        //     .attr("d", path);
-        //
         var county = map.selectAll(".counties")
             .data(wicounties)
             .enter()
