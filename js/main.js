@@ -156,7 +156,11 @@ function setMap(){
               return yScale(parseFloat(d.properties[expressed])) + topBottomPadding;
             })
             .style("fill", function(d){
+              if(value) {
+                //console.log(colorScale(d.properties[expressed]))
                 return colorScale(d.properties[expressed]);
+              } else{
+                return "#ccc";
             });
 
         // var numbers = chart.selectAll(".numbers")
