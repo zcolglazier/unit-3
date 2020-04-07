@@ -54,7 +54,7 @@ function setMap(){
         for (var i=0; i<data.length; i++){
           var val = parseFloat(data[i].properties[expressed]);
           console.log(data[i].properties[expressed])
-          domainArray.push(val);
+          if(val) domainArray.push(val);
         };
         var clusters = ss.ckmeans(domainArray, 5);
         domainArray = clusters.map(function(d){
@@ -94,9 +94,9 @@ function setMap(){
               })
             .attr("d", path)
             .style("fill", function(d){
-              console.log(d.properties)
+              //console.log(d.properties)
               var value = d.properties[expressed];
-              console.log(value)
+              //console.log(value)
               if(value) {
                 console.log(colorScale(d.properties[expressed]))
                 return colorScale(d.properties[expressed]);
@@ -156,38 +156,13 @@ function setMap(){
               return yScale(parseFloat(d.properties[expressed])) + topBottomPadding;
             })
             .style("fill", function(d){
+              var value = d.properties[expressed];
               if(value) {
-                //console.log(colorScale(d.properties[expressed]))
                 return colorScale(d.properties[expressed]);
               } else{
                 return "#ccc";
+              }
             });
-
-        // var numbers = chart.selectAll(".numbers")
-        //     .data(wicounties)
-        //     .enter()
-        //     .append("text")
-        //     .sort(function(a, b){
-        //         //console.log(a[expressed]-b[expressed])
-        //         return a[expressed]-b[expressed]
-        //     })
-        //     .attr("class", function(d){
-        //         return "numbers " + d.COUNTY_NAM;
-        //     })
-        //     .attr("text-anchor", "middle")
-        //     .attr("x", function(d, i){
-        //         var fraction = chartWidth / wicounties.length;
-        //         return i * fraction + (fraction - 1) / 2;
-        //     })
-        //     .attr("y", function(d){
-        //         //console.log(d.properties[expressed])
-        //         //console.log(yScale(parseFloat(d.properties[expressed])))
-        //         return chartHeight - yScale(parseFloat(d.properties[expressed])) + 15;
-        //     })
-        //     .text(function(d){
-        //         return d.properties[expressed];
-        //     });
-
         var chartTitle = chart.append("text")
             .attr("x", 40)
             .attr("y", 40)
