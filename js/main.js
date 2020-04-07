@@ -1,6 +1,7 @@
 //Coded by Zoey Colglazier, April 2020
 (function(){
   var attrArray =["Total Popu", "Total - Male", "Total - Female", "Total - Under 18 years", "Total - 18-64 years", "Total - 65 years and over"];
+  var labelArray = ["Total Population", "Total - Male", "Total - Female", "Total - Under 18 years", "Total - 18-64 years", "Total - 65 years and over"]
   var expressed = attrArray[0];
   //console.log(expressed)
   window.onload = setMap();
@@ -28,12 +29,19 @@ function setMap(){
     var promises = [];
     promises.push(d3.csv("data/data_cleaned.csv"));
     promises.push(d3.json("data/WI_correct.json"));
+    promises.push(d3.json("data/corrected_states.json"));
     Promise.all(promises).then(callback);
 
     function callback(data){
         csvData = data[0];
         counties = data[1];
+        states = data[2];
         var wicounties = topojson.feature(counties, counties.objects.WI_correct).features;
+        var allstates = topojson.feature(states, states.objects.corrected_states).features;
+        // console.log(states)
+        // console.log("topo")
+        // console.log(allstates)
+
         var colorScale = setColorScale(wicounties);
         setGraticule(map,path);
         setEnumUnits(wicounties, map, path, colorScale);
@@ -84,7 +92,12 @@ function setMap(){
       };
 
       function setEnumUnits(wicounties, map, path, colorScale){
-        console.log("coloring")
+        // var background_states = map.append("path")
+        //     console.log('look here')
+        //     .datum(allstates)
+        //     .attr("class", "states")
+        //     .attr("d", path);
+        //
         var county = map.selectAll(".counties")
             .data(wicounties)
             .enter()
