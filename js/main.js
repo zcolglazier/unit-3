@@ -41,15 +41,16 @@ function setMap(){
         // console.log(states)
         // console.log("topo")
         // console.log(allstates)
-        var background_states = map.append("path")
-            console.log('look here')
+        var background_states = map.selectAll(allstates.features)
+
             .data(allstates)
             .enter()
+            .append("path")
             .attr("class", "states")
             .attr("d", path);
 
         var colorScale = setColorScale(wicounties);
-        setGraticule(map,path);
+        // setGraticule(map,path);
         setEnumUnits(wicounties, map, path, colorScale);
         setChart(wicounties, colorScale);
     };
@@ -80,22 +81,22 @@ function setMap(){
         return colorScale;
     };
 
-    function setGraticule(map, path){
-        var graticule = d3.geoGraticule()
-          .step([5, 5])
-
-        var gratBackground = map.append("path")
-          .datum(graticule.outline())
-          .attr("class", "gratBackground")
-          .attr("d", path)
-
-        var gratLines = map.selectAll(".gratLines")
-          .data(graticule.lines())
-          .enter()
-          .append("path")
-          .attr("class", "gratLines")
-          .attr("d", path);
-      };
+    // function setGraticule(map, path){
+    //     var graticule = d3.geoGraticule()
+    //       .step([5, 5])
+    //
+    //     var gratBackground = map.append("path")
+    //       .datum(graticule.outline())
+    //       .attr("class", "gratBackground")
+    //       .attr("d", path)
+    //
+    //     var gratLines = map.selectAll(".gratLines")
+    //       .data(graticule.lines())
+    //       .enter()
+    //       .append("path")
+    //       .attr("class", "gratLines")
+    //       .attr("d", path);
+    //   };
 
       function setEnumUnits(wicounties, map, path, colorScale){
         var county = map.selectAll(".counties")
