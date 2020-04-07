@@ -53,7 +53,7 @@ function setMap(){
         var domainArray = [];
         for (var i=0; i<data.length; i++){
           var val = parseFloat(data[i].properties[expressed]);
-          console.log(data[i].properties[expressed])
+          //console.log(data[i].properties[expressed])
           if(val) domainArray.push(val);
         };
         var clusters = ss.ckmeans(domainArray, 5);
@@ -98,7 +98,7 @@ function setMap(){
               var value = d.properties[expressed];
               //console.log(value)
               if(value) {
-                console.log(colorScale(d.properties[expressed]))
+                //console.log(colorScale(d.properties[expressed]))
                 return colorScale(d.properties[expressed]);
               } else{
                 return "#ccc";
@@ -109,7 +109,7 @@ function setMap(){
       function setChart(wicounties, colorScale){
         var chartWidth = window.innerWidth*0.425,
             chartHeight = 473,
-            leftPadding = 25,
+            leftPadding = 50,
             rightPadding = 2,
             topBottomPadding = 5,
             chartInnerWidth = chartWidth - leftPadding - rightPadding,
@@ -130,7 +130,7 @@ function setMap(){
 
         var yScale = d3.scaleLinear()
             //console.log(chartHeight)
-            .range([0, chartHeight])
+            .range([chartHeight, 0])
             .domain([0, d3.max(wicounties, function (d){
               return parseFloat(d.properties[expressed])*1.2
             })]);
@@ -140,7 +140,7 @@ function setMap(){
             .enter()
             .append("rect")
             .sort(function(a, b){
-                return a[expressed]-b[expressed]
+                return b.properties[expressed]-a.properties[expressed]
             })
             .attr("class", function(d){
                 return "bars" + d.properties.COUNTY_NAM;
@@ -150,10 +150,20 @@ function setMap(){
                 return i*(chartWidth/wicounties.length) + leftPadding;
             })
             .attr("height", function(d, i){
-                return 463 - yScale(parseFloat(d.properties[expressed]));
+                use=d.properties[expressed]
+                if (use){
+                  return 463- yScale(parseFloat(d.properties[expressed]));
+                }else{
+                  return 0
+                }
             })
             .attr("y", function(d, i){
-              return yScale(parseFloat(d.properties[expressed])) + topBottomPadding;
+              use=d.properties[expressed]
+              if (use){
+                return yScale(parseFloat(d.properties[expressed])) + topBottomPadding;
+              }else{
+                return 0
+              }
             })
             .style("fill", function(d){
               var value = d.properties[expressed];
@@ -164,7 +174,7 @@ function setMap(){
               }
             });
         var chartTitle = chart.append("text")
-            .attr("x", 40)
+            .attr("x", 60)
             .attr("y", 40)
             .attr("class", "chartTitle")
             .text(attrArray[0]+"lation in Poverty");
