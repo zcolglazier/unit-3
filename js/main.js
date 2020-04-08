@@ -1,4 +1,7 @@
 //Coded by Zoey Colglazier, April 2020
+
+//The Natural Earth background looks bad, so I'm working on getting a better one that doesn't look like it was traced in crayon
+
 (function(){
   var attrArray =["Total Popu", "Total - Male", "Total - Female", "Total - Under 18 years", "Total - 18-64 years", "Total - 65 years and over"];
   var labelArray = ["Total Population", "Total - Male", "Total - Female", "Total - Under 18 years", "Total - 18-64 years", "Total - 65 years and over"]
@@ -38,19 +41,16 @@ function setMap(){
         states = data[2];
         var wicounties = topojson.feature(counties, counties.objects.WI_correct).features;
         var allstates = topojson.feature(states, states.objects.corrected_states).features;
-        // console.log(states)
-        // console.log("topo")
-        // console.log(allstates)
-        var background_states = map.selectAll(allstates.features)
 
-            .data(allstates)
-            .enter()
-            .append("path")
-            .attr("class", "states")
-            .attr("d", path);
+        // var background_states = map.selectAll(allstates.features)
+        //     .data(allstates)
+        //     .enter()
+        //     .append("path")
+        //     .attr("class", "states")
+        //     .attr("d", path);
 
         var colorScale = setColorScale(wicounties);
-        // setGraticule(map,path);
+        setGraticule(map,path);
         setEnumUnits(wicounties, map, path, colorScale);
         setChart(wicounties, colorScale);
     };
@@ -81,22 +81,22 @@ function setMap(){
         return colorScale;
     };
 
-    // function setGraticule(map, path){
-    //     var graticule = d3.geoGraticule()
-    //       .step([5, 5])
-    //
-    //     var gratBackground = map.append("path")
-    //       .datum(graticule.outline())
-    //       .attr("class", "gratBackground")
-    //       .attr("d", path)
-    //
-    //     var gratLines = map.selectAll(".gratLines")
-    //       .data(graticule.lines())
-    //       .enter()
-    //       .append("path")
-    //       .attr("class", "gratLines")
-    //       .attr("d", path);
-    //   };
+    function setGraticule(map, path){
+        var graticule = d3.geoGraticule()
+          .step([5, 5])
+
+        var gratBackground = map.append("path")
+          .datum(graticule.outline())
+          .attr("class", "gratBackground")
+          .attr("d", path)
+
+        var gratLines = map.selectAll(".gratLines")
+          .data(graticule.lines())
+          .enter()
+          .append("path")
+          .attr("class", "gratLines")
+          .attr("d", path);
+      };
 
       function setEnumUnits(wicounties, map, path, colorScale){
         var county = map.selectAll(".counties")
