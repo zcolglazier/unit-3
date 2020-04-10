@@ -3,7 +3,7 @@
 //The Natural Earth background looks bad, so I'm working on getting a better one that doesn't look like it was traced in crayon
 
 (function(){
-  var attrArray =["Total Popu", "Total - Male", "Total - Female", "Total - Under 18 years", "Total - 18-64 years", "Total - 65 years and over"];
+  var attrArray =["Total Popu", "Total - Ma", "Total - Fe", "Total - Un", "Total - 18", "Total - 65"];
   var labelArray = ["Total Population", "Total - Male", "Total - Female", "Total - Under 18 years", "Total - 18-64 years", "Total - 65 years and over"]
   var expressed = attrArray[0];
   //console.log(expressed)
@@ -48,12 +48,47 @@ function setMap(){
         //     .append("path")
         //     .attr("class", "states")
         //     .attr("d", path);
-
+        createDropdown(labelArray);
         var colorScale = setColorScale(wicounties);
         setGraticule(map,path);
         setEnumUnits(wicounties, map, path, colorScale);
         setChart(wicounties, colorScale);
     };
+
+    function createDropdown(wicounties){
+        var dropdown = d3.select("body")
+            .append("select")
+            .attr("class", "dropdown")
+            .on("change", function(){
+                changeAttribute(this.value, wicounties)
+            });
+        var attrOptions = dropdown.selectAll("attrOptions")
+            .data(labelArray)
+            .enter()
+            .append("option")
+            .attr("value", function(d){ return d })
+            .text(function(d){ return d });
+    };
+
+    function changeAttribute(attribute, wicounties){
+              //correct_index = labelArray.indexOf(attribute);
+              //expressed = attrArray[correct_index];
+              expressed = attribute
+              console.log(expressed)
+              console.log(wicounties)
+              var colorScale = setColorScale(wicounties);
+              var regions = d3.selectAll(".regions")
+                  .style("fill", function(d){
+                      var value = d.properties[expressed];
+                      console.log(value)
+                      if(value) {
+                        return colorScale(value);
+                      } else {
+                        return "#ccc";
+                      }
+              });
+      };
+
     function setColorScale(data){
         console.log("reached color scale")
         var colorClasses = [
@@ -68,7 +103,8 @@ function setMap(){
         var domainArray = [];
         for (var i=0; i<data.length; i++){
           var val = parseFloat(data[i].properties[expressed]);
-          //console.log(data[i].properties[expressed])
+          console.log(expressed)
+          console.log(data[i].properties[expressed])
           if(val) domainArray.push(val);
         };
         var clusters = ss.ckmeans(domainArray, 5);
@@ -84,12 +120,10 @@ function setMap(){
     function setGraticule(map, path){
         var graticule = d3.geoGraticule()
           .step([5, 5])
-
         var gratBackground = map.append("path")
           .datum(graticule.outline())
           .attr("class", "gratBackground")
           .attr("d", path)
-
         var gratLines = map.selectAll(".gratLines")
           .data(graticule.lines())
           .enter()
@@ -191,7 +225,7 @@ function setMap(){
             .attr("x", 60)
             .attr("y", 40)
             .attr("class", "chartTitle")
-            .text(attrArray[0]+"lation in Poverty");
+            .text(labelArray[0]+" in Poverty");
 
         var yAxis = d3.axisLeft()
             .scale(yScale);
