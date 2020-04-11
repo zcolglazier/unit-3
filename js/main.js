@@ -175,8 +175,36 @@ function setMap(){
                 return colorScale(d.properties[expressed]);
               } else{
                 return "#ccc";
-            }
+              }
+            })
+            .on("mouseover", function(d){
+              highlight(d.properties);
             });
+            .on("mouseout", function(d){
+              highlight(d.properties);
+            });
+        var desc = regions.append("desc")
+            .text('{"stroke": "#000", "stroke-width": "0.5px"}');
+      };
+
+      function dehighlight(props){
+          var selected = d3.selectAll("." + props.COUNTY_NAM)
+              .style("stroke", function(){
+                  return getStyle(this, "stroke")
+              })
+              .style("stroke-width", function(){
+                  return getStyle(this, "stroke-width")
+              });
+
+          function getStyle(element, styleName){
+              var styleText = d3.select(element)
+                  .select("desc")
+                  .text();
+
+              var styleObject = JSON.parse(styleText);
+
+              return styleObject[styleName];
+          };
       };
 
       function setChart(wicounties, colorScale){
@@ -203,6 +231,11 @@ function setMap(){
                 return "bar" + d.properties.COUNTY_NAM;
             })
             .attr("width", chartWidth / wicounties.length - 1);
+            .on("mouseover", hightlight);
+            .on("mouseout", dehighlight);
+       var desc = bars.append("desc")
+            .text('{"stroke": "none", "stroke-width": "0px"}');
+
         var chartTitle = chart.append("text")
             .attr("x", 60)
             .attr("y", 40)
@@ -261,7 +294,11 @@ function setMap(){
         var index = labelArray.indexOf(expressed)
           .text(labelArray[index] + " in each region");
       };
-
+  function highlight(props){
+        var selected = d3.selectAll("." + props.COUNTY_NAM)
+            .style("stroke", "blue")
+            .style("stroke-width", "2");
+      };
 };
 
 })();
