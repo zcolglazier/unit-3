@@ -89,7 +89,9 @@ function setMap(){
               console.log(expressed)
               console.log(wicounties)
               var colorScale = setColorScale(wicounties);
-              var regions = d3.selectAll(".regions")
+              var counties = d3.selectAll(".counties")
+                  .transition()
+                  .duration(1000)
                   .style("fill", function(d){
                       var value = d.properties[expressed];
                       console.log(value)
@@ -102,7 +104,12 @@ function setMap(){
               var bars = d3.selectAll(".bar")
                   .sort(function(a, b){
                       return b[expressed] - a[expressed];
-                  });
+                  })
+                  .transition()
+                  .delay(function(d,i){
+                    return i*20
+                  })
+                  .duration(500);
                   updateChart(bars, wicounties.length, colorScale)
       };
 
@@ -251,7 +258,7 @@ function setMap(){
             }
         })
         var chartTitle = d3.select(".chartTitle")
-          index = labelArray.indexOf(expressed)
+        var index = labelArray.indexOf(expressed)
           .text(labelArray[index] + " in each region");
       };
 
