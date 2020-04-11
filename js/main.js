@@ -6,7 +6,19 @@
   var attrArray =["Total Popu", "Total - Ma", "Total - Fe", "Total - Un", "Total - 18", "Total - 65"];
   var labelArray = ["Total Population", "Total - Male", "Total - Female", "Total - Under 18 years", "Total - 18-64 years", "Total - 65 years and over"]
   var expressed = attrArray[0];
-  //console.log(expressed)
+  var chartWidth = window.innerWidth*0.425,
+      chartHeight = 473,
+      leftPadding = 50,
+      rightPadding = 2,
+      topBottomPadding = 5,
+      chartInnerWidth = chartWidth - leftPadding - rightPadding,
+      chartInnerHeight = chartHeight - topBottomPadding * 2,
+      translate = "translate(" + leftPadding + "," + topBottomPadding + ")";
+  var yScale = d3.scaleLinear()
+      .range([chartHeight, 0])
+      .domain([0, 1000000
+      ]);
+
   window.onload = setMap();
 
 function setMap(){
@@ -87,10 +99,16 @@ function setMap(){
                         return "#ccc";
                       }
               });
+              var bars = d3.selectAll(".bar")
+                  .sort(function(a, b){
+                      return b[expressed] - a[expressed];
+                  });
+                  updateChart(bars, wicounties.length, colorScale)
       };
 
     function setColorScale(data){
         console.log("reached color scale")
+        //console.log(wicounties)
         var colorClasses = [
           "#ffffcc",
           "#a1dab4",
@@ -155,15 +173,6 @@ function setMap(){
       };
 
       function setChart(wicounties, colorScale){
-        var chartWidth = window.innerWidth*0.425,
-            chartHeight = 473,
-            leftPadding = 50,
-            rightPadding = 2,
-            topBottomPadding = 5,
-            chartInnerWidth = chartWidth - leftPadding - rightPadding,
-            chartInnerHeight = chartHeight - topBottomPadding * 2,
-            translate = "translate(" + leftPadding + "," + topBottomPadding + ")";
-
         var chart = d3.select("body")
             .append("svg")
             .attr("width", chartWidth)
@@ -176,14 +185,7 @@ function setMap(){
             .attr("height", chartInnerHeight)
             .attr("transform", translate);
 
-        var yScale = d3.scaleLinear()
-            //console.log(chartHeight)
-            .range([chartHeight, 0])
-            .domain([0, d3.max(wicounties, function (d){
-              return parseFloat(d.properties[expressed])*1.2
-            })]);
-
-        var bars = chart.selectAll(".bars")
+        var bars = chart.selectAll(".bar")
             .data(wicounties)
             .enter()
             .append("rect")
@@ -191,36 +193,9 @@ function setMap(){
                 return b.properties[expressed]-a.properties[expressed]
             })
             .attr("class", function(d){
-                return "bars" + d.properties.COUNTY_NAM;
+                return "bar" + d.properties.COUNTY_NAM;
             })
-            .attr("width", chartWidth / wicounties.length - 1)
-            .attr("x", function(d, i){
-                return i*(chartWidth/wicounties.length) + leftPadding;
-            })
-            .attr("height", function(d, i){
-                use=d.properties[expressed]
-                if (use){
-                  return 463- yScale(parseFloat(d.properties[expressed]));
-                }else{
-                  return 0
-                }
-            })
-            .attr("y", function(d, i){
-              use=d.properties[expressed]
-              if (use){
-                return yScale(parseFloat(d.properties[expressed])) + topBottomPadding;
-              }else{
-                return 0
-              }
-            })
-            .style("fill", function(d){
-              var value = d.properties[expressed];
-              if(value) {
-                return colorScale(d.properties[expressed]);
-              } else{
-                return "#ccc";
-              }
-            });
+            .attr("width", chartWidth / wicounties.length - 1);
         var chartTitle = chart.append("text")
             .attr("x", 60)
             .attr("y", 40)
@@ -240,7 +215,46 @@ function setMap(){
             .attr("width", chartInnerWidth)
             .attr("height", chartInnerHeight)
             .attr("transform", translate);
+
+        updateChart(bars, wicounties.length, colorScale);
       };
+      function updateChart(bars, n, colorScale){
+        bars.attr("x", function(d, i){
+            return i * (chartInnerWidth / n) + leftPadding;
+        })
+        //size/resize bars
+        .attr("height", function(d, i){
+          value = d.properties[expressed]
+          if(value){
+            return 463 - yScale(parseFloat(d.properties[expressed]))
+          }else{
+            return 0
+          }
+            //return 463 - yScale(parseFloat(d.properties[expressed]));
+        })
+        .attr("y", function(d, i){
+            value = d.properties[expressed]
+            if(value){
+              return yScale(parseFloat(d.properties[expressed])) + topBottomPadding;
+            }else{
+              return 0
+            }
+            //return yScale(parseFloat(d.properties[expressed])) + topBottomPadding;
+        })
+        //color/recolor bars
+        .style("fill", function(d){
+            var value = d.properties[expressed];
+            if(value) {
+                return colorScale(value);
+            } else {
+                return "#ccc";
+            }
+        })
+        var chartTitle = d3.select(".chartTitle")
+          index = labelArray.indexOf(expressed)
+          .text(labelArray[index] + " in each region");
+      };
+
 };
 
 })();
