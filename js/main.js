@@ -179,10 +179,11 @@ function setMap(){
             })
             .on("mouseover", function(d){
               highlight(d.properties);
-            });
+            })
             .on("mouseout", function(d){
               highlight(d.properties);
-            });
+            })
+            .on("mousemove", moveLabel);
         var desc = regions.append("desc")
             .text('{"stroke": "#000", "stroke-width": "0.5px"}');
       };
@@ -194,7 +195,9 @@ function setMap(){
               })
               .style("stroke-width", function(){
                   return getStyle(this, "stroke-width")
-              });
+              })
+          d3.select(."infolabel")
+              .remove();
 
           function getStyle(element, styleName){
               var styleText = d3.select(element)
@@ -205,6 +208,28 @@ function setMap(){
 
               return styleObject[styleName];
           };
+      };
+
+      function moveLabel(){
+          var x = d3.event.clientX + 10,
+              y = d3.event.clientY - 75;
+
+          d3.select(".infolabel")
+              .style("left", x + "px")
+              .style("top", y + "px");
+      };
+
+      function setLabel(props){
+          var labelAttribute = "<h1>" + props[expressed] +
+              "</h1><b>" + expressed + "</b>";
+          var infolabel = d3.select("body")
+              .append("div")
+              .attr("class", "infolabel")
+              .attr("id", props.COUNT_NAM + "_label")
+              .html(labelAttribute);
+          var regionName = infolabel.append("div")
+              .attr("class", "labelname")
+              .html(props.name);
       };
 
       function setChart(wicounties, colorScale){
@@ -233,6 +258,8 @@ function setMap(){
             .attr("width", chartWidth / wicounties.length - 1);
             .on("mouseover", hightlight);
             .on("mouseout", dehighlight);
+            .on("mousemove", moveLabel);
+
        var desc = bars.append("desc")
             .text('{"stroke": "none", "stroke-width": "0px"}');
 
@@ -298,6 +325,7 @@ function setMap(){
         var selected = d3.selectAll("." + props.COUNTY_NAM)
             .style("stroke", "blue")
             .style("stroke-width", "2");
+        setLabel(props)
       };
 };
 
