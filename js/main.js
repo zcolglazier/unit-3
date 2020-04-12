@@ -211,8 +211,20 @@ function setMap(){
       };
 
       function moveLabel(){
-          var x = d3.event.clientX + 10,
-              y = d3.event.clientY - 75;
+
+          var labelWidth = d3.select(".infolabel")
+              .node()
+              .getBoundingClientRect()
+              .width;
+
+          var x1 = d3.event.clientX + 10,
+              y1 = d3.event.clientY - 75,
+              x2 = d3.event.clientX - labelWidth - 10,
+              y2 = d3.event.clientY + 25;
+
+          var x = d3.event.clientX > window.innerWidth - labelWidth - 20 ? x2 : x1;
+
+          var y = d3.event.clientY < 75 ? y2 : y1;
 
           d3.select(".infolabel")
               .style("left", x + "px")
