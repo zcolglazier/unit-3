@@ -14,10 +14,7 @@
       chartInnerWidth = chartWidth - leftPadding - rightPadding,
       chartInnerHeight = chartHeight - topBottomPadding * 2,
       translate = "translate(" + leftPadding + "," + topBottomPadding + ")";
-  var yScale = d3.scaleLinear()
-      .range([chartHeight, 0])
-      .domain([0, 1000000
-      ]);
+  var yScale;
 
   window.onload = setMap();
 
@@ -101,7 +98,7 @@ function setMap(){
               });
               var bars = d3.selectAll(".bar")
                   .sort(function(a, b){
-                      return b[expressed] - a[expressed];
+                      return b.properties[expressed] - a.properties[expressed];
                   })
                   .transition()
                   .delay(function(d,i){
@@ -109,7 +106,7 @@ function setMap(){
                   })
                   .duration(500);
               console.log("made it")
-              updateChart(bars, wicounties.length, colorScale)
+              updateChart(bars, wicounties.length, colorScale, wicounties)
       };
 
     function setColorScale(data){
@@ -204,10 +201,10 @@ function setMap(){
 
           var styleObject = JSON.parse(styleText);
             return styleObject[styleName];
-
-          d3.select(".infolabel")
-              .remove();
           };
+
+      d3.select(".infolabel")
+          .remove();
       };
 
       function moveLabel(){
@@ -231,9 +228,11 @@ function setMap(){
       };
 
       function setLabel(props){
+          oth_in = attrArray.indexOf(expressed)
+          att = labelArray[oth_in]
           //console.log(props[expressed])
           var labelAttribute = "<h1>" + props[expressed] +
-              "</h1><b>" + expressed + "</b>";
+              "</h1><b>" + att + "</b>";
           var infolabel = d3.select("body")
               .append("div")
               .attr("class", "infolabel")
@@ -245,6 +244,14 @@ function setMap(){
       };
 
       function setChart(wicounties, colorScale){
+        yScale = d3.scaleLog()
+            .range([chartHeight, 0])
+            .domain([1,
+                      d3.max(wicounties, function (d) {
+                        if (parseFloat(d.properties[expressed])){
+                          return (parseFloat(d.properties[expressed])) * 1.1
+                        };
+                  })]);
         var chart = d3.select("body")
             .append("svg")
             .attr("width", chartWidth)
@@ -295,12 +302,19 @@ function setMap(){
             .attr("height", chartInnerHeight)
             .attr("transform", translate);
 
-        updateChart(bars, wicounties.length, colorScale);
+        updateChart(bars, wicounties.length, colorScale, wicounties);
       };
 
 
-      function updateChart(bars, n, colorScale){
-        //  console.log("at function")
+      function updateChart(bars, n, colorScale, wicounties){
+        yScale = d3.scaleLog()
+            .range([chartHeight, 0])
+            .domain([1000,
+                      d3.max(wicounties, function (d) {
+                        if (parseFloat(d.properties[expressed])){
+                          return (parseFloat(d.properties[expressed])) * 1.1
+                        };
+                  })]);
           bars.attr("x", function(d, i){
               return i * (chartInnerWidth / n) + leftPadding;
             })
@@ -308,6 +322,7 @@ function setMap(){
                 value = d.properties[expressed]
                 //console.log(value)
                 if(value){
+                  //console.log(yScale(parseFloat(d.properties[expressed])))
                   return 463 - yScale(parseFloat(d.properties[expressed]))
                 }else{
                   return 0
@@ -335,7 +350,7 @@ function setMap(){
             //console.log(expressed)
             var index = attrArray.indexOf(expressed)
             var chartTitle = d3.select(".chartTitle")
-              .text(labelArray[index] + " in each region");
+              .text(labelArray[index] + " in poverty");
             };
 
   function highlight(props){
