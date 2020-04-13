@@ -283,7 +283,7 @@ function setMap(){
             .text('{"stroke": "none", "stroke-width": "0px"}');
 
         var chartTitle = chart.append("text")
-            .attr("x", 60)
+            .attr("x", 80)
             .attr("y", 40)
             .attr("class", "chartTitle")
             .text(labelArray[0]+" in Poverty");
