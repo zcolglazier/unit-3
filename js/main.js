@@ -85,16 +85,14 @@ function setMap(){
     function changeAttribute(attribute, wicounties){
               correct_index = labelArray.indexOf(attribute);
               expressed = attrArray[correct_index];
-              //expressed = attribute
-              //console.log(expressed)
-              //console.log(wicounties)
+
               var colorScale = setColorScale(wicounties);
               var counties = d3.selectAll(".counties")
                   .transition()
                   .duration(1000)
                   .style("fill", function(d){
                       var value = d.properties[expressed];
-                      console.log(value)
+                      //console.log(value)
                       if(value) {
                         return colorScale(value);
                       } else {
@@ -110,11 +108,12 @@ function setMap(){
                     return i*20
                   })
                   .duration(500);
-                  updateChart(bars, wicounties.length, colorScale)
+              console.log("made it")
+              updateChart(bars, wicounties.length, colorScale)
       };
 
     function setColorScale(data){
-        console.log("reached color scale")
+        //console.log("reached color scale")
         //console.log(data)
         var colorClasses = [
           "#ffffcc",
@@ -128,8 +127,8 @@ function setMap(){
         var domainArray = [];
         for (var i=0; i<data.length; i++){
           var val = parseFloat(data[i].properties[expressed]);
-          console.log(expressed)
-          console.log(data[i].properties[expressed])
+          //console.log(expressed)
+          //console.log(data[i].properties[expressed])
           if(val) domainArray.push(val);
         };
         var clusters = ss.ckmeans(domainArray, 5);
@@ -267,7 +266,7 @@ function setMap(){
                 return b.properties[expressed]-a.properties[expressed]
             })
             .attr("class", function(d){
-                return "bar" + d.properties.COUNTY_NAM;
+                return "bar " + d.properties.COUNTY_NAM;
             })
             .attr("width", chartWidth / wicounties.length - 1)
             .on("mouseover", highlight)
@@ -299,42 +298,47 @@ function setMap(){
 
         updateChart(bars, wicounties.length, colorScale);
       };
+
+
       function updateChart(bars, n, colorScale){
-        bars.attr("x", function(d, i){
-            return i * (chartInnerWidth / n) + leftPadding;
-        })
-        //size/resize bars
-        .attr("height", function(d, i){
-          value = d.properties[expressed]
-          if(value){
-            return 463 - yScale(parseFloat(d.properties[expressed]))
-          }else{
-            return 0
-          }
+          console.log("at function")
+          bars.attr("x", function(d, i){
+              return i * (chartInnerWidth / n) + leftPadding;
+            })
+            .attr("height", function(d, i){
+                value = d.properties[expressed]
+                console.log(value)
+                if(value){
+                  return 463 - yScale(parseFloat(d.properties[expressed]))
+                }else{
+                  return 0
+                }
             //return 463 - yScale(parseFloat(d.properties[expressed]));
-        })
-        .attr("y", function(d, i){
-            value = d.properties[expressed]
-            if(value){
-              return yScale(parseFloat(d.properties[expressed])) + topBottomPadding;
-            }else{
-              return 0
-            }
+            })
+            .attr("y", function(d, i){
+                value = d.properties[expressed]
+                if(value){
+                  return yScale(parseFloat(d.properties[expressed])) + topBottomPadding;
+                }else{
+                  return 0
+                }
             //return yScale(parseFloat(d.properties[expressed])) + topBottomPadding;
-        })
+            })
         //color/recolor bars
-        .style("fill", function(d){
-            var value = d.properties[expressed];
-            if(value) {
-                return colorScale(value);
-            } else {
-                return "#ccc";
-            }
-        })
-        var chartTitle = d3.select(".chartTitle")
-        var index = labelArray.indexOf(expressed)
-          .text(labelArray[index] + " in each region");
-      };
+            .style("fill", function(d){
+                var value = d.properties[expressed];
+                if(value) {
+                  return colorScale(value);
+                } else {
+                  return "#ccc";
+                }
+              });
+            console.log(expressed)
+            var index = attrArray.indexOf(expressed)
+            var chartTitle = d3.select(".chartTitle")
+              .text(labelArray[index] + " in each region");
+            };
+
   function highlight(props){
         //console.log(props.COUNTY_NAM)
         var selected = d3.selectAll("." + props.COUNTY_NAM)
