@@ -180,7 +180,7 @@ function setMap(){
               highlight(d.properties);
             })
             .on("mouseout", function(d){
-              highlight(d.properties);
+              dehighlight(d.properties);
             })
             .on("mousemove", moveLabel);
         var desc = county.append("desc")
@@ -188,6 +188,7 @@ function setMap(){
       };
 
       function dehighlight(props){
+          //console.log("inside deh")
           var selected = d3.selectAll("." + props.COUNTY_NAM)
               .style("stroke", function(){
                   return getStyle(this, "stroke")
@@ -195,23 +196,21 @@ function setMap(){
               .style("stroke-width", function(){
                   return getStyle(this, "stroke-width")
               });
+          //console.log("reached getstyle")
+      function getStyle(element, styleName){
+          var styleText = d3.select(element)
+              .select("desc")
+              .text();
 
-          function getStyle(element, styleName){
-              var styleText = d3.select(element)
-                  .select("desc")
-                  .text();
+          var styleObject = JSON.parse(styleText);
+            return styleObject[styleName];
 
-              var styleObject = JSON.parse(styleText);
-
-              return styleObject[styleName];
-
-          var rem = d3.select(".infolabel")
+          d3.select(".infolabel")
               .remove();
           };
       };
 
       function moveLabel(){
-
           var labelWidth = d3.select(".infolabel")
               .node()
               .getBoundingClientRect()
@@ -238,7 +237,7 @@ function setMap(){
           var infolabel = d3.select("body")
               .append("div")
               .attr("class", "infolabel")
-              .attr("id", props.COUNT_NAM + "_label")
+              .attr("id", props.COUNTY_NAM + "_label")
               .html(labelAttribute);
           var countyName = infolabel.append("div")
               .attr("class", "labelname")
@@ -301,13 +300,13 @@ function setMap(){
 
 
       function updateChart(bars, n, colorScale){
-          console.log("at function")
+        //  console.log("at function")
           bars.attr("x", function(d, i){
               return i * (chartInnerWidth / n) + leftPadding;
             })
             .attr("height", function(d, i){
                 value = d.properties[expressed]
-                console.log(value)
+                //console.log(value)
                 if(value){
                   return 463 - yScale(parseFloat(d.properties[expressed]))
                 }else{
@@ -333,7 +332,7 @@ function setMap(){
                   return "#ccc";
                 }
               });
-            console.log(expressed)
+            //console.log(expressed)
             var index = attrArray.indexOf(expressed)
             var chartTitle = d3.select(".chartTitle")
               .text(labelArray[index] + " in each region");
