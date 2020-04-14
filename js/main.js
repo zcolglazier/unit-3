@@ -350,7 +350,7 @@ function setMap(){
             //console.log(expressed)
             var index = attrArray.indexOf(expressed)
             var chartTitle = d3.select(".chartTitle")
-              .text(labelArray[index] + " in poverty");
+              .text(labelArray[index] + " in Poverty");
             };
 
   function highlight(props){
