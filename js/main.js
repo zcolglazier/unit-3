@@ -6,7 +6,7 @@
   var attrArray =["Total Popu", "Total - Ma", "Total - Fe", "Total - Un", "Total - 18", "Total - 65"];
   var labelArray = ["Total Population", "Total - Male", "Total - Female", "Total - Under 18 years", "Total - 18-64 years", "Total - 65 years and over"]
   var expressed = attrArray[0];
-  var chartWidth = window.innerWidth*0.425,
+  var chartWidth = window.innerWidth*0.475,
       chartHeight = 473,
       leftPadding = 50,
       rightPadding = 2,
@@ -19,7 +19,7 @@
   window.onload = setMap();
 
 function setMap(){
-    var width = window.innerWidth*0.5,
+    var width = window.innerWidth*0.45,
         height = 460;
 
     var map = d3.select("body")
@@ -41,25 +41,26 @@ function setMap(){
     var promises = [];
     promises.push(d3.csv("data/data_cleaned.csv"));
     promises.push(d3.json("data/WI_correct.json"));
-    promises.push(d3.json("data/corrected_states.json"));
+    promises.push(d3.json("data/actual_states.json"));
     Promise.all(promises).then(callback);
 
     function callback(data){
         csvData = data[0];
         counties = data[1];
         states = data[2];
+        //console.log(states)
         var wicounties = topojson.feature(counties, counties.objects.WI_correct).features;
-        var allstates = topojson.feature(states, states.objects.corrected_states).features;
-
-        // var background_states = map.selectAll(allstates.features)
-        //     .data(allstates)
-        //     .enter()
-        //     .append("path")
-        //     .attr("class", "states")
-        //     .attr("d", path);
+        var allstates = topojson.feature(states, states.objects.actual_states).features;
+        //console.log(allstates)
+        var background_states = map.selectAll(allstates.features)
+            .data(allstates)
+            .enter()
+            .append("path")
+            .attr("class", "states")
+            .attr("d", path);
         createDropdown(wicounties);
         var colorScale = setColorScale(wicounties);
-        setGraticule(map,path);
+        //setGraticule(map,path);
         setEnumUnits(wicounties, map, path, colorScale);
         setChart(wicounties, colorScale);
     };
@@ -82,7 +83,7 @@ function setMap(){
     function changeAttribute(attribute, wicounties){
               correct_index = labelArray.indexOf(attribute);
               expressed = attrArray[correct_index];
-
+              hold = 0
               var colorScale = setColorScale(wicounties);
               var counties = d3.selectAll(".counties")
                   .transition()
@@ -98,7 +99,10 @@ function setMap(){
               });
               var bars = d3.selectAll(".bar")
                   .sort(function(a, b){
-                      return b.properties[expressed] - a.properties[expressed];
+                    if (b.properties[expressed]){
+                      hold+=1
+                      return b.properties[expressed] - a.properties[expressed]
+                    }
                   })
                   .transition()
                   .delay(function(d,i){
@@ -106,7 +110,7 @@ function setMap(){
                   })
                   .duration(500);
               console.log("made it")
-              updateChart(bars, wicounties.length, colorScale, wicounties)
+              updateChart(bars, (hold-1), colorScale, wicounties)
       };
 
     function setColorScale(data){
@@ -230,9 +234,15 @@ function setMap(){
       function setLabel(props){
           oth_in = attrArray.indexOf(expressed)
           att = labelArray[oth_in]
-          //console.log(props[expressed])
-          var labelAttribute = "<h1>" + props[expressed] +
-              "</h1><b>" + att + "</b>";
+          var labelAttribute
+          if (props[expressed]){
+            labelAttribute = "<h1>" + props[expressed] +
+                "</h1><b>" + att + "</b>";
+          } else {
+            labelAttribute = "<h1> No Data </h1>"
+          }
+          // var labelAttribute = "<h1>" + props[expressed] +
+          //     "</h1><b>" + att + "</b>";
           var infolabel = d3.select("body")
               .append("div")
               .attr("class", "infolabel")
@@ -244,6 +254,7 @@ function setMap(){
       };
 
       function setChart(wicounties, colorScale){
+        var hold = 0
         yScale = d3.scaleLog()
             .range([chartHeight, 0])
             .domain([1,
@@ -272,18 +283,25 @@ function setMap(){
                 return b.properties[expressed]-a.properties[expressed]
             })
             .attr("class", function(d){
-                return "bar " + d.properties.COUNTY_NAM;
+              if(d.properties[expressed]){
+                hold+=1
+                return "bar " + d.properties.COUNTY_NAM
+              }
             })
-            .attr("width", chartWidth / wicounties.length - 1)
-            .on("mouseover", highlight)
-            .on("mouseout", dehighlight)
+            .attr("width", chartWidth / hold - 1)
+            .on("mouseover", function(d){
+              highlight(d.properties);
+            })
+            .on("mouseout", function(d){
+              dehighlight(d.properties);
+            })
             .on("mousemove", moveLabel);
 
        var desc = bars.append("desc")
             .text('{"stroke": "none", "stroke-width": "0px"}');
 
         var chartTitle = chart.append("text")
-            .attr("x", 80)
+            .attr("x", 100)
             .attr("y", 40)
             .attr("class", "chartTitle")
             .text(labelArray[0]+" in Poverty");
@@ -302,7 +320,7 @@ function setMap(){
             .attr("height", chartInnerHeight)
             .attr("transform", translate);
 
-        updateChart(bars, wicounties.length, colorScale, wicounties);
+        updateChart(bars, (hold-1), colorScale, wicounties);
       };
 
 
@@ -356,8 +374,8 @@ function setMap(){
   function highlight(props){
         //console.log(props.COUNTY_NAM)
         var selected = d3.selectAll("." + props.COUNTY_NAM)
-            .style("stroke", "blue")
-            .style("stroke-width", "2");
+            .style("stroke", "orange")
+            .style("stroke-width", "3");
         setLabel(props)
       };
 };
