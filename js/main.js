@@ -51,26 +51,28 @@ function setMap(){
         //console.log(states)
         var wicounties = topojson.feature(counties, counties.objects.WI_correct).features;
         var allstates = topojson.feature(states, states.objects.actual_states).features;
-        //console.log(allstates)
+
+        var countiesWithData = wicounties.filter(county=>county.properties[expressed]);
+
         var background_states = map.selectAll(allstates.features)
             .data(allstates)
             .enter()
             .append("path")
             .attr("class", "states")
             .attr("d", path);
-        createDropdown(wicounties);
+        createDropdown(countiesWithData);
         var colorScale = setColorScale(wicounties);
         //setGraticule(map,path);
         setEnumUnits(wicounties, map, path, colorScale);
-        setChart(wicounties, colorScale);
+        setChart(countiesWithData, colorScale);
     };
 
-    function createDropdown(wicounties){
+    function createDropdown(countiesWithData){
         var dropdown = d3.select("body")
             .append("select")
             .attr("class", "dropdown")
             .on("change", function(){
-                changeAttribute(this.value, wicounties)
+                changeAttribute(this.value, countiesWithData)
             });
         var attrOptions = dropdown.selectAll("attrOptions")
             .data(labelArray)
@@ -80,11 +82,11 @@ function setMap(){
             .text(function(d){ return d });
     };
 
-    function changeAttribute(attribute, wicounties){
+    function changeAttribute(attribute, countiesWithData){
               correct_index = labelArray.indexOf(attribute);
               expressed = attrArray[correct_index];
-              hold = 0
-              var colorScale = setColorScale(wicounties);
+              //hold = 0
+              var colorScale = setColorScale(countiesWithData);
               var counties = d3.selectAll(".counties")
                   .transition()
                   .duration(1000)
@@ -99,10 +101,7 @@ function setMap(){
               });
               var bars = d3.selectAll(".bar")
                   .sort(function(a, b){
-                    if (b.properties[expressed]){
-                      hold+=1
-                      return b.properties[expressed] - a.properties[expressed]
-                    }
+                      return b.properties[expressed] - a.properties[expressed];
                   })
                   .transition()
                   .delay(function(d,i){
@@ -110,7 +109,7 @@ function setMap(){
                   })
                   .duration(500);
               console.log("made it")
-              updateChart(bars, (hold-1), colorScale, wicounties)
+              updateChart(bars, countiesWithData.length, colorScale, countiesWithData)
       };
 
     function setColorScale(data){
@@ -253,12 +252,11 @@ function setMap(){
               .html(props. COUNTY_NAM);
       };
 
-      function setChart(wicounties, colorScale){
-        var hold = 0
+      function setChart(countiesWithData, colorScale){
         yScale = d3.scaleLog()
             .range([chartHeight, 0])
             .domain([1,
-                      d3.max(wicounties, function (d) {
+                      d3.max(countiesWithData, function (d) {
                         if (parseFloat(d.properties[expressed])){
                           return (parseFloat(d.properties[expressed])) * 1.1
                         };
@@ -276,19 +274,16 @@ function setMap(){
             .attr("transform", translate);
 
         var bars = chart.selectAll(".bar")
-            .data(wicounties)
+            .data(countiesWithData)
             .enter()
             .append("rect")
             .sort(function(a, b){
                 return b.properties[expressed]-a.properties[expressed]
             })
             .attr("class", function(d){
-              if(d.properties[expressed]){
-                hold+=1
-                return "bar " + d.properties.COUNTY_NAM
-              }
+                return "bar " + d.properties.COUNTY_NAM;
             })
-            .attr("width", chartWidth / hold - 1)
+            .attr("width", chartWidth / countiesWithData.length-1)
             .on("mouseover", function(d){
               highlight(d.properties);
             })
@@ -320,7 +315,7 @@ function setMap(){
             .attr("height", chartInnerHeight)
             .attr("transform", translate);
 
-        updateChart(bars, (hold-1), colorScale, wicounties);
+        updateChart(bars, countiesWithData.length, colorScale, countiesWithData);
       };
 
 
