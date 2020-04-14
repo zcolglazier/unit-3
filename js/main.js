@@ -1,5 +1,6 @@
 //Coded by Zoey Colglazier, April 2020
 
+//wrapper
 (function(){
   var attrArray =["Total Popu", "Total - Ma", "Total - Fe", "Total - Un", "Total - 18", "Total - 65"];
   var labelArray = ["Total Population", "Total - Male", "Total - Female", "Total - Under 18 years", "Total - 18-64 years", "Total - 65 years and over"]
@@ -16,6 +17,7 @@
 
   window.onload = setMap();
 
+//build map
 function setMap(){
     var width = window.innerWidth*0.45,
         height = 460;
@@ -49,18 +51,19 @@ function setMap(){
 
         var wicounties = topojson.feature(counties, counties.objects.WI_correct).features;
         var allstates = topojson.feature(states, states.objects.actual_states).features;
-
+        //filter for counties with data - not all do
         var countiesWithData = wicounties.filter(county=>county.properties[expressed]);
-
+        //build background
         var background_states = map.selectAll(allstates.features)
             .data(allstates)
             .enter()
             .append("path")
             .attr("class", "states")
             .attr("d", path);
+
+        //call functions
         createDropdown(countiesWithData);
         var colorScale = setColorScale(wicounties);
-        //setGraticule(map,path);
         setEnumUnits(wicounties, map, path, colorScale);
         setChart(countiesWithData, colorScale);
     };
@@ -79,7 +82,7 @@ function setMap(){
             .attr("value", function(d){ return d })
             .text(function(d){ return d });
     };
-
+    //called in createDropdown
     function changeAttribute(attribute, countiesWithData){
               correct_index = labelArray.indexOf(attribute);
               expressed = attrArray[correct_index];
@@ -109,6 +112,7 @@ function setMap(){
               updateChart(bars, countiesWithData.length, colorScale, countiesWithData)
       };
 
+    //called in callback, changeAttribute
     function setColorScale(data){
         var colorClasses = [
           "#ffffcc",
@@ -135,21 +139,7 @@ function setMap(){
         return colorScale;
     };
 
-    function setGraticule(map, path){
-        var graticule = d3.geoGraticule()
-          .step([5, 5])
-        var gratBackground = map.append("path")
-          .datum(graticule.outline())
-          .attr("class", "gratBackground")
-          .attr("d", path)
-        var gratLines = map.selectAll(".gratLines")
-          .data(graticule.lines())
-          .enter()
-          .append("path")
-          .attr("class", "gratLines")
-          .attr("d", path);
-      };
-
+      //build and color enumeration units
       function setEnumUnits(wicounties, map, path, colorScale){
         var county = map.selectAll(".counties")
             .data(wicounties)
@@ -178,49 +168,7 @@ function setMap(){
             .text('{"stroke": "#000", "stroke-width": "0.5px"}');
       };
 
-      function dehighlight(props){
-
-          var selected = d3.selectAll("." + props.COUNTY_NAM)
-              .style("stroke", function(){
-                  return getStyle(this, "stroke")
-              })
-              .style("stroke-width", function(){
-                  return getStyle(this, "stroke-width")
-              });
-
-      function getStyle(element, styleName){
-          var styleText = d3.select(element)
-              .select("desc")
-              .text();
-
-          var styleObject = JSON.parse(styleText);
-            return styleObject[styleName];
-          };
-
-      d3.select(".infolabel")
-          .remove();
-      };
-
-      function moveLabel(){
-          var labelWidth = d3.select(".infolabel")
-              .node()
-              .getBoundingClientRect()
-              .width;
-
-          var x1 = d3.event.clientX + 10,
-              y1 = d3.event.clientY - 75,
-              x2 = d3.event.clientX - labelWidth - 10,
-              y2 = d3.event.clientY + 25;
-
-          var x = d3.event.clientX > window.innerWidth - labelWidth - 20 ? x2 : x1;
-
-          var y = d3.event.clientY < 75 ? y2 : y1;
-
-          d3.select(".infolabel")
-              .style("left", x + "px")
-              .style("top", y + "px");
-      };
-
+      //labels for each bar and unit
       function setLabel(props){
           oth_in = attrArray.indexOf(expressed)
           att = labelArray[oth_in]
@@ -241,6 +189,7 @@ function setMap(){
               .html(props. COUNTY_NAM);
       };
 
+      //build coordinated visualization
       function setChart(countiesWithData, colorScale){
         yScale = d3.scaleLog()
             .range([chartHeight, 0])
@@ -307,6 +256,7 @@ function setMap(){
         updateChart(bars, countiesWithData.length, colorScale, countiesWithData);
       };
 
+      //populates chart based on attribute selected by user
       function updateChart(bars, n, colorScale, wicounties){
         yScale = d3.scaleLog()
             .range([chartHeight, 0])
@@ -344,20 +294,60 @@ function setMap(){
                   return "#ccc";
                 }
               });
-            //console.log(expressed)
             var index = attrArray.indexOf(expressed)
             var chartTitle = d3.select(".chartTitle")
               .text(labelArray[index] + " in Poverty");
             };
 
+  //functions for highlighting, dehighlighting, and moving the label for the bars and units - called in setChart and setEnumUnits
   function highlight(props){
-        //console.log(props.COUNTY_NAM)
         var selected = d3.selectAll("." + props.COUNTY_NAM)
             .style("stroke", "orange")
             .style("stroke-width", "3");
         setLabel(props)
       };
+
+  function dehighlight(props){
+        var selected = d3.selectAll("." + props.COUNTY_NAM)
+              .style("stroke", function(){
+                  return getStyle(this, "stroke")
+              })
+              .style("stroke-width", function(){
+                  return getStyle(this, "stroke-width")
+              });
+
+  function getStyle(element, styleName){
+          var styleText = d3.select(element)
+              .select("desc")
+              .text();
+
+          var styleObject = JSON.parse(styleText);
+            return styleObject[styleName];
+          };
+
+      d3.select(".infolabel")
+          .remove();
+      };
+
+  function moveLabel(){
+          var labelWidth = d3.select(".infolabel")
+              .node()
+              .getBoundingClientRect()
+              .width;
+
+          var x1 = d3.event.clientX + 10,
+              y1 = d3.event.clientY - 75,
+              x2 = d3.event.clientX - labelWidth - 10,
+              y2 = d3.event.clientY + 25;
+
+          var x = d3.event.clientX > window.innerWidth - labelWidth - 20 ? x2 : x1;
+
+          var y = d3.event.clientY < 75 ? y2 : y1;
+
+          d3.select(".infolabel")
+              .style("left", x + "px")
+              .style("top", y + "px");
+      };
 };
 
 })();
-//setMap()
