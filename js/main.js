@@ -1,7 +1,5 @@
 //Coded by Zoey Colglazier, April 2020
 
-//The Natural Earth background looks bad, so I'm working on getting a better one that doesn't look like it was traced in crayon
-
 (function(){
   var attrArray =["Total Popu", "Total - Ma", "Total - Fe", "Total - Un", "Total - 18", "Total - 65"];
   var labelArray = ["Total Population", "Total - Male", "Total - Female", "Total - Under 18 years", "Total - 18-64 years", "Total - 65 years and over"]
@@ -48,7 +46,7 @@ function setMap(){
         csvData = data[0];
         counties = data[1];
         states = data[2];
-        //console.log(states)
+
         var wicounties = topojson.feature(counties, counties.objects.WI_correct).features;
         var allstates = topojson.feature(states, states.objects.actual_states).features;
 
@@ -85,14 +83,13 @@ function setMap(){
     function changeAttribute(attribute, countiesWithData){
               correct_index = labelArray.indexOf(attribute);
               expressed = attrArray[correct_index];
-              //hold = 0
+
               var colorScale = setColorScale(countiesWithData);
               var counties = d3.selectAll(".counties")
                   .transition()
                   .duration(1000)
                   .style("fill", function(d){
                       var value = d.properties[expressed];
-                      //console.log(value)
                       if(value) {
                         return colorScale(value);
                       } else {
@@ -108,13 +105,11 @@ function setMap(){
                     return i*20
                   })
                   .duration(500);
-              console.log("made it")
+
               updateChart(bars, countiesWithData.length, colorScale, countiesWithData)
       };
 
     function setColorScale(data){
-        //console.log("reached color scale")
-        //console.log(data)
         var colorClasses = [
           "#ffffcc",
           "#a1dab4",
@@ -127,8 +122,7 @@ function setMap(){
         var domainArray = [];
         for (var i=0; i<data.length; i++){
           var val = parseFloat(data[i].properties[expressed]);
-          //console.log(expressed)
-          //console.log(data[i].properties[expressed])
+
           if(val) domainArray.push(val);
         };
         var clusters = ss.ckmeans(domainArray, 5);
@@ -137,7 +131,7 @@ function setMap(){
         });
         domainArray.shift();
         colorScale.domain(domainArray);
-        //console.log(domainArray);
+
         return colorScale;
     };
 
@@ -166,11 +160,8 @@ function setMap(){
               })
             .attr("d", path)
             .style("fill", function(d){
-              //console.log(d.properties)
               var value = d.properties[expressed];
-              //console.log(value)
               if(value) {
-                //console.log(colorScale(d.properties[expressed]))
                 return colorScale(d.properties[expressed]);
               } else{
                 return "#ccc";
@@ -188,7 +179,7 @@ function setMap(){
       };
 
       function dehighlight(props){
-          //console.log("inside deh")
+
           var selected = d3.selectAll("." + props.COUNTY_NAM)
               .style("stroke", function(){
                   return getStyle(this, "stroke")
@@ -196,7 +187,7 @@ function setMap(){
               .style("stroke-width", function(){
                   return getStyle(this, "stroke-width")
               });
-          //console.log("reached getstyle")
+
       function getStyle(element, styleName){
           var styleText = d3.select(element)
               .select("desc")
@@ -240,8 +231,6 @@ function setMap(){
           } else {
             labelAttribute = "<h1> No Data </h1>"
           }
-          // var labelAttribute = "<h1>" + props[expressed] +
-          //     "</h1><b>" + att + "</b>";
           var infolabel = d3.select("body")
               .append("div")
               .attr("class", "infolabel")
@@ -318,7 +307,6 @@ function setMap(){
         updateChart(bars, countiesWithData.length, colorScale, countiesWithData);
       };
 
-
       function updateChart(bars, n, colorScale, wicounties){
         yScale = d3.scaleLog()
             .range([chartHeight, 0])
@@ -333,14 +321,11 @@ function setMap(){
             })
             .attr("height", function(d, i){
                 value = d.properties[expressed]
-                //console.log(value)
                 if(value){
-                  //console.log(yScale(parseFloat(d.properties[expressed])))
                   return 463 - yScale(parseFloat(d.properties[expressed]))
                 }else{
                   return 0
                 }
-            //return 463 - yScale(parseFloat(d.properties[expressed]));
             })
             .attr("y", function(d, i){
                 value = d.properties[expressed]
@@ -349,9 +334,8 @@ function setMap(){
                 }else{
                   return 0
                 }
-            //return yScale(parseFloat(d.properties[expressed])) + topBottomPadding;
             })
-        //color/recolor bars
+
             .style("fill", function(d){
                 var value = d.properties[expressed];
                 if(value) {
